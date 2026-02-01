@@ -1,0 +1,21 @@
+model SyncLog {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  direction       SyncDirection
+  succeeded       Boolean
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  errorMessage    String?
+  notesCount      Int?
+  foldersCount    Int?
+  workspacesCount Int?
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([userId, direction, createdAt(sort: Desc)])
+}
+
+enum SyncDirection {
+  push
+  pull
+}

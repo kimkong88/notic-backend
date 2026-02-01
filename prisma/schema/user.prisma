@@ -1,0 +1,26 @@
+model User {
+    id           String         @id @default(uuid())
+    email        String         @unique
+    name         String
+    imageUrl     String?
+    role         Role           @default(user)
+    platform     Platform       @default(google)
+    createdAt    DateTime       @default(now())
+    updatedAt    DateTime       @updatedAt
+    tokens       Token[]
+    notes        Note[]
+    folders      Folder[]
+    workspaces   Workspace[]
+    syncLogs     SyncLog[]
+    syncDeletionLogs SyncDeletionLog[]
+    subscriptions Subscription[]
+}
+
+enum Role {
+    admin
+    user
+}
+
+enum Platform {
+    google
+}

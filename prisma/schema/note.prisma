@@ -1,0 +1,23 @@
+model Note {
+  id           String    @id @default(uuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId     String    // extension sessionId
+  content      String    @db.Text
+  lastModified DateTime
+  createdAt    DateTime
+  updatedAt    DateTime  @updatedAt
+  displayName  String?
+  folderId     String?   // extension folder id (client id), not FK
+  workspaceId  String    // extension workspace id (client id); always set (default workspace if omitted on client)
+  deletedAt    DateTime? // soft delete: set when in trash (epoch ms from client), null = active
+  color        String?   // optional hex color for note (e.g. #3b82f6)
+  isBookmarked Boolean   @default(false) // user bookmark (virtual folder in Recent + Folders)
+
+  @@unique([userId, clientId])
+  @@index([userId])
+  @@index([userId, workspaceId])
+  @@index([userId, deletedAt])
+  @@index([userId, workspaceId, folderId])
+  @@index([userId, lastModified(sort: Desc)])
+}

@@ -1,0 +1,1 @@
+export const BILLING_PROVIDER = Symbol('BILLING_PROVIDER');

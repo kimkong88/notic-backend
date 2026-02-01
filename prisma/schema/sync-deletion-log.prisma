@@ -1,0 +1,17 @@
+model SyncDeletionLog {
+  id         String           @id @default(uuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entityType DeletedEntityType
+  clientId   String           // extension client id (note/folder/workspace id)
+  deletedAt  DateTime         @default(now())
+
+  @@index([userId, deletedAt(sort: Desc)])
+  @@index([userId, entityType, deletedAt(sort: Desc)])
+}
+
+enum DeletedEntityType {
+  note
+  folder
+  workspace
+}

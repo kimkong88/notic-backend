@@ -1,0 +1,18 @@
+model Folder {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId    String   // extension folder id
+  name        String
+  parentId    String?  // extension parent folder id (client id), not FK
+  createdAt   DateTime
+  updatedAt   DateTime @updatedAt
+  displayName String?
+  workspaceId String   // extension workspace id (client id); always set (default workspace if omitted on client)
+  color       String?  // optional hex color for folder (e.g. #3b82f6)
+
+  @@unique([userId, clientId])
+  @@index([userId])
+  @@index([userId, workspaceId])
+  @@index([userId, parentId])
+}

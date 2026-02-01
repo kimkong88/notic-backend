@@ -1,0 +1,15 @@
+model Workspace {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clientId  String   // extension workspace id
+  name      String
+  isDefault Boolean  @default(false)
+  color     String?  // optional hex color (e.g. #3b82f6)
+  icon      String?  // optional single-char or emoji for sidebar
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, clientId])
+  @@index([userId])
+}
