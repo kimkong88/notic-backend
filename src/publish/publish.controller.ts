@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Delete, UseGuards } from '@nestjs/c
 import { PublishService } from './publish.service';
 import { PublishNoteDto, UnpublishNoteDto } from './publish.dto';
 import { AuthGuard } from '../guards/authGuard';
+import { ProSubscriptionGuard } from '../guards/pro-subscription.guard';
 import { UserContext } from '../decorators/userContext';
 import type { User } from '../../prisma/generated/prisma/client';
 
@@ -9,9 +10,9 @@ import type { User } from '../../prisma/generated/prisma/client';
 export class PublishController {
   constructor(private readonly publishService: PublishService) {}
 
-  /** Publish a note: generate unique share code and return share URL. Auth required. */
+  /** Publish a note: generate unique share code and return share URL. Auth + Pro required. */
   @Post('publish')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, ProSubscriptionGuard)
   async publish(
     @UserContext() { user }: { user: User },
     @Body() dto: PublishNoteDto,
@@ -19,9 +20,9 @@ export class PublishController {
     return this.publishService.publishNote(user.id, dto.clientId);
   }
 
-  /** Unpublish: clear share code for the note. Auth required. */
+  /** Unpublish: clear share code for the note. Auth + Pro required. */
   @Delete('publish')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, ProSubscriptionGuard)
   async unpublish(
     @UserContext() { user }: { user: User },
     @Body() dto: UnpublishNoteDto,
