@@ -1,6 +1,6 @@
 # Conventional Note Features Checklist (Excluding Subscription)
 
-Confirmation that every conventional note feature is implemented and synced in both **frontend** (note-light extension) and **backend** (note-light-backend), **excluding subscription** (subscription is frontend-only debug / quota; no backend subscription API).
+Confirmation that every conventional note feature is implemented and synced in both **frontend** (notic extension) and **backend** (notic-backend), **excluding subscription** (subscription is frontend-only debug / quota; no backend subscription API).
 
 ---
 
@@ -70,7 +70,7 @@ Confirmation that every conventional note feature is implemented and synced in b
 |--------|----------|---------|------|
 | Export notes (file) | ✅ dashboard-export | — | Local file export only |
 | Import notes (file) | ✅ dashboard-import | — | Local file import only |
-| Context menu "Add page to Note Light" | ✅ Creates note in storage; hashchange + loadAllNotes so open tab sees it; triggerSync when signed in | — | Note is synced via normal push after creation |
+| Context menu "Add page to Notic" | ✅ Creates note in storage; hashchange + loadAllNotes so open tab sees it; triggerSync when signed in | — | Note is synced via normal push after creation |
 
 ---
 

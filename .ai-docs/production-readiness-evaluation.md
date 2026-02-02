@@ -1,6 +1,6 @@
 # Production Readiness Evaluation — Conventional Note App
 
-Evaluation of whether the Note Light app (extension + backend) can **reliably** go to production. Focus: security, reliability, operability, and remaining gaps.
+Evaluation of whether the Notic app (extension + backend) can **reliably** go to production. Focus: security, reliability, operability, and remaining gaps.
 
 ---
 
@@ -12,7 +12,7 @@ Evaluation of whether the Note Light app (extension + backend) can **reliably** 
 
 ---
 
-## Backend (note-light-backend)
+## Backend (notic-backend)
 
 ### In place
 
@@ -41,7 +41,7 @@ Core security and data integrity are in place. For **reliable** production you s
 
 ---
 
-## Frontend (note-light extension)
+## Frontend (Notic extension)
 
 ### In place
 
@@ -93,7 +93,7 @@ Sync and auth behavior are solid for normal use: retries, chunking, deletion log
 **Frontend**
 
 - [ ] Publish extension and fix extension ID in backend CORS (`CHROME_EXTENSION_ID`).
-- [ ] Ensure backend base URL (e.g. api.notelight.app) is correct in build/env.
+- [ ] Ensure backend base URL (e.g. api.getnotic.io) is correct in build/env.
 - [ ] (Recommended) Handle storage write failures in sync/merge and critical save paths.
 
 **Ops**

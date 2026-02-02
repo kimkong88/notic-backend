@@ -9,18 +9,18 @@
 ## Current state
 
 - **Backend:** NestJS + Prisma. No Stripe yet. `User` has `Role` (admin/user), no subscription fields.
-- **Frontend:** Dashboard has "Manage your NoteLight plan and billing" and a **Subscription (debug)** block (simulated toggle; will be replaced).
+- **Frontend:** Dashboard has "Manage your Notic plan and billing" and a **Subscription (debug)** block (simulated toggle; will be replaced).
 - **Product:** Free tier = 10-note sync limit; paid = remove limit (and any future premium features).
 
 ## Decisions to confirm
 
 1. **Who pays via Stripe?** Web app only, or also Chrome extension users? (Extension can open your web billing page or use Chrome Web Store; this plan assumes Stripe for **web** and optionally linking the same account for extension.)
-2. **Plans:** Single paid plan (e.g. "Pro" / "NoteLight Pro") vs multiple tiers (e.g. Pro / Team). Plan below assumes **one paid plan** to start.
+2. **Plans:** Single paid plan (e.g. "Pro" / "Notic Pro") vs multiple tiers (e.g. Pro / Team). Plan below assumes **one paid plan** to start.
 3. **Billing UI:** Stripe **Checkout** (redirect to Stripe-hosted page) is simplest and PCI-safe. **Customer Portal** (Stripe-hosted) for manage/cancel. Optionally later: **Elements** (embedded card) for custom UI.
 
 ---
 
-## Phase 1 – Backend (note-light-backend)
+## Phase 1 – Backend (notic-backend)
 
 ### 1.1 Dependencies and env
 
@@ -76,7 +76,7 @@
 
 ---
 
-## Phase 2 – Frontend (note-light)
+## Phase 2 – Frontend (notic)
 
 ### 2.1 Replace Subscription (debug)
 
@@ -103,7 +103,7 @@
 
 ## Phase 3 – Stripe Dashboard (manual)
 
-- Create Product: e.g. "NoteLight Pro."
+- Create Product: e.g. "Notic Pro."
 - Create Price: recurring (monthly or yearly), attach to Product. Copy Price ID → `STRIPE_PRICE_ID`.
 - Webhooks: add endpoint `https://your-api.com/billing/webhook`, subscribe to `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`. Copy signing secret → `STRIPE_WEBHOOK_SECRET`.
 - (Optional) Customer Portal: enable in Stripe Dashboard and configure branding/return URL.

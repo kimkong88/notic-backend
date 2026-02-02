@@ -1,12 +1,12 @@
 # Extension storage partitioning by user ID
 
-All sync-related local data in the note-light extension is partitioned by user so that switching accounts does not mix or leak data.
+All sync-related local data in the Notic extension is partitioned by user so that switching accounts does not mix or leak data.
 
 ## Mechanism
 
 - **Partition**: Either the signed-in user's `userId` (from backend auth response) or `__local__` when not signed in.
-- **Storage keys**: Sync-related keys include the partition, e.g. `noteLight_${partition}_workspaces`, `noteLight_${partition}_session_${sessionId}`.
-- **Auth**: Backend returns `{ user, tokens, action }` on `POST /auth/authenticate`. The extension stores `user.id` in `noteLight_authUserId` and clears it on sign-out (with tokens).
+- **Storage keys**: Sync-related keys include the partition, e.g. `notic_${partition}_workspaces`, `notic_${partition}_session_${sessionId}`.
+- **Auth**: Backend returns `{ user, tokens, action }` on `POST /auth/authenticate`. The extension stores `user.id` in `notic_authUserId` and clears it on sign-out (with tokens).
 - **Partition resolution**: `getStoragePartition()` (api-client) returns `getStoredUserId() ?? LOCAL_PARTITION`.
 
 ## Partition-scoped keys (storage-keys.ts)

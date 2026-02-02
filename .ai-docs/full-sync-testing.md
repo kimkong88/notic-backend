@@ -2,7 +2,7 @@
 
 ## What was added
 
-**Extension (note-light):**
+**Extension (Notic):**
 
 1. **pullFromServer()** – GET /sync (paginated); loops on `nextCursor`; returns combined notes + folders/workspaces from first page.
 2. **mergeIntoLocal(server)** – Writes server notes, folders, workspaces into `chrome.storage.local`. Does not remove local-only items.

@@ -3,6 +3,7 @@ import { Response } from 'express';
 import { NotionService } from './notion.service';
 import { SetSyncRootDto } from './notion.dto';
 import { AuthGuard } from '../guards/authGuard';
+import { ProSubscriptionGuard } from '../guards/pro-subscription.guard';
 import { UserContext } from '../decorators/userContext';
 import type { User } from '../../prisma/generated/prisma/client';
 
@@ -107,9 +108,9 @@ export class NotionController {
     return this.notionService.setSyncRoot(user.id, dto.syncRootPageIdOrUrl);
   }
 
-  /** Manual sync: push workspaces, folders, notes to Notion. */
+  /** Manual sync: push workspaces, folders, notes to Notion. Pro only (402 if free). */
   @Post('sync')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, ProSubscriptionGuard)
   async sync(@UserContext() { user }: { user: User }) {
     return this.notionService.syncToNotion(user.id);
   }

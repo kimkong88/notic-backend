@@ -7,7 +7,7 @@ Lightweight Notion-style “publish to web” for a single note: get a public re
 ## Reference: Notion (lighter version)
 
 - **Notion:** Share → Publish to web → toggle “Share to web” → public link; optional “Search engine indexing”; “Unpublish” to revoke.
-- **Note-light (lighter):** One note = one public link. Publish → copy link; Unpublish to revoke. No search indexing toggle in v1.
+- **Notic (lighter):** One note = one public link. Publish → copy link; Unpublish to revoke. No search indexing toggle in v1.
 
 ---
 
@@ -44,7 +44,7 @@ Lightweight Notion-style “publish to web” for a single note: get a public re
 - **Code generation:** Same pattern as **my-saju-backend**: generate random string, ensure uniqueness in DB, retry on collision.
   - **Reference:** `my-saju-backend/src/utils/string.ts` — `generateRandomString(length)` (alphanumeric).
   - **Reference:** `my-saju-backend/src/reports/reports.service.ts` — `generateUniqueCode()`: loop with `generateRandomString(6)`, check `findByCode(code)`, return when unique; throw after max attempts.
-- **note-light-backend:** Add a shared helper (or use the same util): generate e.g. 8–10 char code, check `notesRepository.findByShareCode(code)` (or unique index on `shareCode`), retry until unique. Store on note when user clicks “Publish”; clear when “Unpublish”.
+- **notic-backend:** Add a shared helper (or use the same util): generate e.g. 8–10 char code, check `notesRepository.findByShareCode(code)` (or unique index on `shareCode`), retry until unique. Store on note when user clicks “Publish”; clear when “Unpublish”.
 - **Public view:** `GET /p/:code` (or `/share/:code`) — no auth; lookup note by `shareCode`. Return HTML or JSON for the shared note content (read-only). If no note with that code or note deleted → 404.
 
 ---

@@ -7,7 +7,7 @@
 - **Body:** `multipart/form-data` with field name **`file`** (image file).
 - **Response:** `{ "url": "https://<cloudfront>/images/YYYY/MM/DD/..." }` (CloudFront URL).
 
-### Env vars (note-light-backend)
+### Env vars (notic-backend)
 
 | Variable | Description |
 |----------|-------------|
@@ -32,7 +32,7 @@ If S3/CloudFront env vars are missing, the service logs a warning and returns 40
 
 ---
 
-## Extension (note-light): image support – to implement
+## Extension (notic): image support – to implement
 
 Three ways to add images in the editor (dashboard + PiP):
 

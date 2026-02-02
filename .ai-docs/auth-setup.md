@@ -2,7 +2,7 @@
 
 ## Comparison
 
-| Aspect | my-saju-backend | note-light-backend |
+| Aspect | my-saju-backend | notic-backend |
 |--------|-----------------|---------------------|
 | **Providers** | Google + Apple | Google only |
 | **Model** | Account (platform, email) → many Users | Single User per Google (email, platform) |
