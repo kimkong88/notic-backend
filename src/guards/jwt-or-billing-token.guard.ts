@@ -23,7 +23,7 @@ export class JwtOrBillingTokenGuard implements CanActivate {
       (request.headers['x-billing-token'] as string);
 
     if (billingToken) {
-      const userId = await this.billingLinkService.resolveAndConsumeBillingToken(
+      const userId = await this.billingLinkService.resolveBillingToken(
         billingToken,
       );
       if (!userId) {

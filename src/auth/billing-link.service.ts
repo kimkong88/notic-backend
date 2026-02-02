@@ -31,12 +31,19 @@ export class BillingLinkService {
     };
   }
 
-  /** Resolve billing token to userId and invalidate it (one-time use). Returns null if invalid or expired. */
-  async resolveAndConsumeBillingToken(token: string): Promise<string | null> {
+  /** Resolve billing token to userId without invalidating. Use for guard so billing page can make multiple requests until token expires. */
+  async resolveBillingToken(token: string): Promise<string | null> {
     const row = await tokensRepository.findUnique(token, TokenType.billing);
     if (!row) return null;
     if (new Date() > row.expires) return null;
-    await tokensRepository.deleteToken(token, TokenType.billing);
     return row.userId;
+  }
+
+  /** Resolve billing token to userId and invalidate it (one-time use). Returns null if invalid or expired. */
+  async resolveAndConsumeBillingToken(token: string): Promise<string | null> {
+    const userId = await this.resolveBillingToken(token);
+    if (!userId) return null;
+    await tokensRepository.deleteToken(token, TokenType.billing);
+    return userId;
   }
 }
