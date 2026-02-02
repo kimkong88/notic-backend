@@ -29,7 +29,7 @@ export class BillingService {
 
   async createCheckoutSession(
     userId: string,
-    options: { successUrl?: string; cancelUrl?: string; priceKey?: 'monthly' | 'yearly' },
+    options: { successUrl?: string; cancelUrl?: string; priceKey?: 'monthly' | 'yearly' | 'trial' },
   ): Promise<{ url: string }> {
     return this.provider.createCheckoutSession(userId, options);
   }

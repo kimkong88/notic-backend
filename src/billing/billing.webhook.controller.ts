@@ -39,25 +39,21 @@ const LEMON_SUBSCRIPTION_EVENTS = [
   'subscription_expired',
 ] as const;
 
-/** Map Lemon Squeezy status to our SubscriptionStatus. */
+/** Map Lemon Squeezy status to our SubscriptionStatus (payment-focused). */
 function mapLemonStatusToOurs(lem: string): SubscriptionStatus {
   switch (lem) {
     case 'on_trial':
-      return SubscriptionStatus.trial;
     case 'active':
-      return SubscriptionStatus.active;
     case 'paused':
-      return SubscriptionStatus.active;
+      return SubscriptionStatus.paid;
     case 'past_due':
-      return SubscriptionStatus.past_due;
     case 'unpaid':
       return SubscriptionStatus.past_due;
     case 'cancelled':
-      return SubscriptionStatus.canceled;
     case 'expired':
-      return SubscriptionStatus.expired;
+      return SubscriptionStatus.canceled;
     default:
-      return SubscriptionStatus.active;
+      return SubscriptionStatus.paid;
   }
 }
 
@@ -72,6 +68,13 @@ function computeExpiredAt(attrs: {
   if (!raw) return null;
   const d = new Date(raw);
   return Number.isNaN(d.getTime()) ? null : d;
+}
+
+/** When cancelled/expired payload has no ends_at, grant this many days of access (grace). */
+const CANCELLED_EXPIRED_GRACE_DAYS = 7;
+
+function graceExpiredAt(): Date {
+  return new Date(Date.now() + CANCELLED_EXPIRED_GRACE_DAYS * 24 * 60 * 60 * 1000);
 }
 
 /** No JWT. Verify signature with provider secret; map provider events to canonical events; call SubscriptionEventHandler. */
@@ -137,7 +140,7 @@ export class BillingWebhookController {
           billingProvider: 'lemon_squeezy',
           billingCustomerId: customerId ?? null,
           billingSubscriptionId: subscriptionId ?? null,
-          status: status ?? SubscriptionStatus.active,
+          status: status ?? SubscriptionStatus.paid,
           expiredAt,
         },
       };
@@ -152,12 +155,14 @@ export class BillingWebhookController {
         },
       };
     } else if (eventName === 'subscription_cancelled' || eventName === 'subscription_expired') {
+      const effectiveExpiredAt =
+        expiredAt != null ? expiredAt : graceExpiredAt();
       canonical = {
         type: 'subscription_canceled',
         userId,
         data: {
           billingSubscriptionId: subscriptionId ?? null,
-          expiredAt: expiredAt ?? undefined,
+          expiredAt: effectiveExpiredAt,
         },
       };
     } else {

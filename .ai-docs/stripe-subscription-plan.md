@@ -145,17 +145,17 @@
 1. User clicks “Manage plan & billing” in **extension**.
 2. Extension calls backend with its JWT: `POST /auth/billing-link` (or similar).
 3. Backend validates JWT, creates **short-lived (e.g. 5–10 min) one-time token** for that user, returns it.
-4. Extension opens: `https://cloud-domain.com/billing?billing_token=<token>`.
+4. Extension opens: `https://cloud-domain.com/billing?token=<token>` (from `redirectUrl`).
 5. Cloud billing page loads, reads `billing_token`, sends it to backend (exchange for session or use for that request). Backend validates, serves billing UI / create-checkout / create-portal, **invalidates token** after first use (or short TTL).
 6. Cloud never sees the extension’s real JWT; billing is always for the user who clicked in the extension.
 
-**Backend addition:** `POST /auth/billing-link` (JWT required), returns `{ billingToken, expiresAt }`. Endpoint that accepts `billing_token` (e.g. `GET /billing/status?billing_token=...` or `POST /auth/session` with billing_token to set cookie) and invalidates after use.
+**Backend addition:** `POST /auth/billing-link` (JWT required), returns `{ redirectUrl }` (e.g. `/billing?token=...`). Endpoints accept `token` (query/body) or `x-billing-token` header and invalidate after use.
 
 ---
 
 ## Decided: Landing page first, then billing UI
 
-**If we have to touch the cloud anyway** (for the billing return URL with `billing_token`), build the **landing page (cloud)** first. That gives:
+**If we have to touch the cloud anyway** (for the billing return URL with `token`), build the **landing page (cloud)** first. That gives:
 - A live cloud site to which extension can link (“Manage plan & billing” → open landing/billing URL).
 - A place to add `/billing?billing_token=...` and the billing UI (upgrade, manage, status) later.
 - Stripe success/cancel URLs pointing at the same domain (e.g. `https://your-domain.com/billing/return?checkout=success`).

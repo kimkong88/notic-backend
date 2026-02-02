@@ -15,4 +15,5 @@ model Token {
 
 enum TokenType {
     refresh
+    billing
 }

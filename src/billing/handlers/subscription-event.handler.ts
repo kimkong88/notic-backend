@@ -43,6 +43,19 @@ export class SubscriptionEventHandler {
   }
 
   private async handleActivated(userId: string, data: SubscriptionActivatedData): Promise<void> {
+    if (data.billingSubscriptionId) {
+      const existing = await subscriptionsRepository.findByBillingSubscriptionId(data.billingSubscriptionId);
+      if (existing) {
+        await subscriptionsRepository.update(existing.id, {
+          user: { connect: { id: userId } },
+          billingProvider: data.billingProvider,
+          billingCustomerId: data.billingCustomerId ?? undefined,
+          status: data.status,
+          expiredAt: data.expiredAt ?? undefined,
+        });
+        return;
+      }
+    }
     await subscriptionsRepository.create({
       user: { connect: { id: userId } },
       billingProvider: data.billingProvider,

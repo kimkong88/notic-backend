@@ -5,12 +5,9 @@ import type { Request } from 'express';
 
 vi.mock('../../prisma/generated/prisma/enums', () => ({
   SubscriptionStatus: {
-    active: 'active',
-    trial: 'trial',
-    beta: 'beta',
+    paid: 'paid',
     canceled: 'canceled',
     past_due: 'past_due',
-    expired: 'expired',
   },
 }));
 
@@ -147,7 +144,7 @@ describe('BillingWebhookController', () => {
           billingProvider: 'lemon_squeezy',
           billingCustomerId: '999',
           billingSubscriptionId: 'sub-1',
-          status: 'active',
+          status: 'paid',
           expiredAt: new Date('2025-02-01T00:00:00.000Z'),
         },
       });
@@ -212,7 +209,7 @@ describe('BillingWebhookController', () => {
       });
     });
 
-    it('calls handler with subscription_canceled for subscription_expired event', async () => {
+    it('calls handler with subscription_canceled for subscription_expired event (expiredAt from payload ends_at)', async () => {
       const body = {
         meta: { event_name: 'subscription_expired', custom_data: { userId: 'u3' } },
         data: {
@@ -234,6 +231,32 @@ describe('BillingWebhookController', () => {
           expiredAt: new Date('2025-05-01T00:00:00.000Z'),
         },
       });
+    });
+
+    it('subscription_expired with no ends_at: passes grace expiredAt (now + CANCELLED_EXPIRED_GRACE_DAYS)', async () => {
+      const body = {
+        meta: { event_name: 'subscription_expired', custom_data: { user_id: 'u4' } },
+        data: {
+          id: 'sub-4',
+          attributes: { status: 'expired' },
+        },
+      };
+      const raw = Buffer.from(JSON.stringify(body), 'utf8');
+      const req = mockRequest({ rawBody: raw, signature: sign(WEBHOOK_SECRET, raw) });
+
+      const before = Date.now();
+      const result = await controller.handleWebhook(req);
+      const after = Date.now();
+
+      expect(result).toEqual({ received: true });
+      expect(handler.handle).toHaveBeenCalledTimes(1);
+      const [canonical] = (handler.handle as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(canonical.type).toBe('subscription_canceled');
+      expect(canonical.userId).toBe('u4');
+      expect(canonical.data.billingSubscriptionId).toBe('sub-4');
+      const graceMs = 7 * 24 * 60 * 60 * 1000;
+      expect(canonical.data.expiredAt.getTime()).toBeGreaterThanOrEqual(before + graceMs - 1000);
+      expect(canonical.data.expiredAt.getTime()).toBeLessThanOrEqual(after + graceMs + 1000);
     });
   });
 });

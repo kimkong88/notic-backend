@@ -1,7 +1,7 @@
 export interface CreateCheckoutSessionOptions {
   successUrl?: string;
   cancelUrl?: string;
-  priceKey?: 'monthly' | 'yearly';
+  priceKey?: 'monthly' | 'yearly' | 'trial';
 }
 
 export interface IBillingProvider {

@@ -3,12 +3,9 @@ import { SubscriptionEventHandler } from './subscription-event.handler';
 
 vi.mock('../../../prisma/generated/prisma/enums', () => ({
   SubscriptionStatus: {
-    active: 'active',
-    trial: 'trial',
-    beta: 'beta',
+    paid: 'paid',
     canceled: 'canceled',
     past_due: 'past_due',
-    expired: 'expired',
   },
 }));
 
@@ -35,7 +32,9 @@ describe('SubscriptionEventHandler', () => {
   });
 
   describe('handle', () => {
-    it('subscription_activated: calls create with user and billing data', async () => {
+    it('subscription_activated with new billingSubscriptionId: calls create', async () => {
+      findByBillingSubscriptionIdMock.mockResolvedValue(null);
+
       const event = {
         type: 'subscription_activated' as const,
         userId: 'user-1',
@@ -43,24 +42,57 @@ describe('SubscriptionEventHandler', () => {
           billingProvider: 'lemon_squeezy',
           billingCustomerId: 'cust-1',
           billingSubscriptionId: 'sub-1',
-          status: 'active' as const,
+          status: 'paid' as const,
           expiredAt: new Date('2025-06-01T00:00:00.000Z'),
         },
       };
 
       await handler.handle(event);
 
+      expect(findByBillingSubscriptionIdMock).toHaveBeenCalledWith('sub-1');
       expect(createMock).toHaveBeenCalledTimes(1);
       expect(createMock).toHaveBeenCalledWith({
         user: { connect: { id: 'user-1' } },
         billingProvider: 'lemon_squeezy',
         billingCustomerId: 'cust-1',
         billingSubscriptionId: 'sub-1',
-        status: 'active',
+        status: 'paid',
         expiredAt: new Date('2025-06-01T00:00:00.000Z'),
       });
       expect(updateMock).not.toHaveBeenCalled();
-      expect(updateByBillingSubscriptionIdMock).not.toHaveBeenCalled();
+    });
+
+    it('subscription_activated when billingSubscriptionId already exists: upserts (update instead of create)', async () => {
+      findByBillingSubscriptionIdMock.mockResolvedValue({
+        id: 'existing-sub-id',
+        userId: 'user-1',
+        billingSubscriptionId: 'sub-1',
+      });
+
+      const event = {
+        type: 'subscription_activated' as const,
+        userId: 'user-1',
+        data: {
+          billingProvider: 'lemon_squeezy',
+          billingCustomerId: 'cust-1',
+          billingSubscriptionId: 'sub-1',
+          status: 'paid' as const,
+          expiredAt: new Date('2025-06-01T00:00:00.000Z'),
+        },
+      };
+
+      await handler.handle(event);
+
+      expect(findByBillingSubscriptionIdMock).toHaveBeenCalledWith('sub-1');
+      expect(updateMock).toHaveBeenCalledTimes(1);
+      expect(updateMock).toHaveBeenCalledWith('existing-sub-id', {
+        user: { connect: { id: 'user-1' } },
+        billingProvider: 'lemon_squeezy',
+        billingCustomerId: 'cust-1',
+        status: 'paid',
+        expiredAt: new Date('2025-06-01T00:00:00.000Z'),
+      });
+      expect(createMock).not.toHaveBeenCalled();
     });
 
     it('subscription_updated with billingSubscriptionId: finds sub and updates when userId matches', async () => {
@@ -101,7 +133,7 @@ describe('SubscriptionEventHandler', () => {
         type: 'subscription_updated' as const,
         userId: 'user-3',
         data: {
-          status: 'active' as const,
+          status: 'paid' as const,
           expiredAt: new Date('2025-08-01T00:00:00.000Z'),
         },
       };
@@ -110,12 +142,12 @@ describe('SubscriptionEventHandler', () => {
 
       expect(getCurrentByUserIdMock).toHaveBeenCalledWith('user-3');
       expect(updateMock).toHaveBeenCalledWith('current-sub-id', {
-        status: 'active',
+        status: 'paid',
         expiredAt: new Date('2025-08-01T00:00:00.000Z'),
       });
     });
 
-    it('subscription_canceled with billingSubscriptionId: calls updateByBillingSubscriptionId', async () => {
+    it('subscription_canceled: mutates existing record (updateByBillingSubscriptionId), does not create new row', async () => {
       const event = {
         type: 'subscription_canceled' as const,
         userId: 'user-4',

@@ -1,0 +1,24 @@
+---
+description: Prisma migration flow – create and apply migrations only as documented
+globs: prisma/**
+alwaysApply: false
+---
+
+# Prisma migrations
+
+**Authoritative doc:** `.ai-docs/prisma-migrations.md` (from project root). Use only the flow described there.
+
+## Flow
+
+- **Create a new migration** (after editing `prisma/schema/`): run `npm run prisma:migrate`, enter a short name, commit the new migration folder.
+- **Apply migrations** (after pull, in CI, on deploy): run `npm run prisma:deploy`.
+
+## Do not
+
+- Edit or delete migration files that have already been applied.
+- Reorder migration folders (timestamps define order).
+- Create migrations by hand or with any command other than `npm run prisma:migrate`.
+
+## One-time fix
+
+On existing DBs that had the removed migration `20260129180000_add_note_folder_workspace_color_icon` applied, run the `DELETE FROM "_prisma_migrations"` query once per DB—see `.ai-docs/prisma-migrations.md`.

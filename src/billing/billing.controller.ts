@@ -17,7 +17,7 @@ export class BillingController {
   @Post('create-checkout-session')
   async createCheckoutSession(
     @UserContext() { user }: { user: User },
-    @Body() body: { successUrl?: string; cancelUrl?: string; priceKey?: 'monthly' | 'yearly' },
+    @Body() body: { successUrl?: string; cancelUrl?: string; priceKey?: 'monthly' | 'yearly' | 'trial' },
   ) {
     return this.billingService.createCheckoutSession(user.id, {
       successUrl: body.successUrl,

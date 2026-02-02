@@ -18,12 +18,12 @@ export class JwtOrBillingTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
     const billingToken =
-      (request.query?.billing_token as string) ??
-      (request.body?.billing_token as string) ??
+      (request.query?.token as string) ??
+      (request.body?.token as string) ??
       (request.headers['x-billing-token'] as string);
 
     if (billingToken) {
-      const userId = this.billingLinkService.resolveAndConsumeBillingToken(
+      const userId = await this.billingLinkService.resolveAndConsumeBillingToken(
         billingToken,
       );
       if (!userId) {

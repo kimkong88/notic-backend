@@ -12,13 +12,11 @@ model Subscription {
 
   @@index([userId])
   @@index([billingSubscriptionId])
+  @@unique([billingSubscriptionId])
 }
 
 enum SubscriptionStatus {
-  active   // paid, current
-  trial    // in trial; set expiredAt = trial end from provider
-  beta     // beta access, no payment (expiredAt null or far future)
-  canceled // user canceled; access until expiredAt (set from period end)
-  past_due // payment failed
-  expired  // kept for DB compat; prefer expiredAt for "over" (no scheduler needed)
+  paid     // Payment current or was made for the period (includes trial/beta from provider).
+  canceled // Subscription canceled; access until expiredAt.
+  past_due // Payment failed or overdue.
 }
