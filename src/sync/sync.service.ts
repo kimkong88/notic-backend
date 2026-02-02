@@ -72,6 +72,7 @@ export class SyncService {
               ...(n.deletedAt != null && { deletedAt: toEpochMs(n.deletedAt) }),
               ...(n.color != null && { color: n.color }),
               ...(row.isBookmarked != null && { isBookmarked: row.isBookmarked }),
+              ...(n.shareCode != null && { shareCode: n.shareCode }),
             };
           }),
           folders: folders.map((f) => ({
@@ -141,6 +142,7 @@ export class SyncService {
             ...(n.deletedAt != null && { deletedAt: toEpochMs(n.deletedAt) }),
             ...(n.color != null && { color: n.color }),
             ...(row.isBookmarked != null && { isBookmarked: row.isBookmarked }),
+            ...(n.shareCode != null && { shareCode: n.shareCode }),
           };
         }),
         folders: [],

@@ -131,6 +131,12 @@ export class SyncNoteItemDto {
   @IsOptional()
   @IsBoolean()
   isBookmarked?: boolean;
+
+  /** When set, note is publicly viewable at GET /p/:shareCode. Server-only (not sent in push). */
+  @IsOptional()
+  @IsString()
+  @MaxLength(32)
+  shareCode?: string;
 }
 
 export class SyncPushDto {
@@ -192,6 +198,7 @@ export interface SyncPullResponse {
     deletedAt?: number;
     color?: string;
     isBookmarked?: boolean;
+    shareCode?: string;
   }>;
   folders: Array<{
     id: string;

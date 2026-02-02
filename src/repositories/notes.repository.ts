@@ -151,3 +151,63 @@ export async function deleteByUserIdExceptClientIds(
   });
   return result.count;
 }
+
+/** Find note by share code (for public GET /p/:code). Returns null if not found or note is soft-deleted. */
+export async function findNoteByShareCode(
+  shareCode: string,
+  tx?: TransactionClient,
+): Promise<{
+  id: string;
+  content: string;
+  displayName: string | null;
+  lastModified: Date;
+} | null> {
+  const client = tx ?? prisma;
+  const note = await client.note.findFirst({
+    where: {
+      shareCode,
+      deletedAt: null,
+    },
+    select: { id: true, content: true, displayName: true, lastModified: true },
+  });
+  return note;
+}
+
+/** Set or clear shareCode for a note (user must own the note). Returns true if note was updated. */
+export async function setNoteShareCode(
+  userId: string,
+  clientId: string,
+  shareCode: string | null,
+  tx?: TransactionClient,
+): Promise<boolean> {
+  const client = tx ?? prisma;
+  const result = await client.note.updateMany({
+    where: { userId, clientId },
+    data: { shareCode },
+  });
+  return result.count > 0;
+}
+
+/** Check if a shareCode is already used by any note (for unique code generation). */
+export async function isShareCodeTaken(shareCode: string, tx?: TransactionClient): Promise<boolean> {
+  const client = tx ?? prisma;
+  const existing = await client.note.findFirst({
+    where: { shareCode },
+    select: { id: true },
+  });
+  return existing != null;
+}
+
+/** Find note by userId and clientId (for publish: check exists and current shareCode). */
+export async function findNoteByUserIdAndClientId(
+  userId: string,
+  clientId: string,
+  tx?: TransactionClient,
+): Promise<{ shareCode: string | null } | null> {
+  const client = tx ?? prisma;
+  const note = await client.note.findUnique({
+    where: { userId_clientId: { userId, clientId } },
+    select: { shareCode: true },
+  });
+  return note;
+}

@@ -1,4 +1,17 @@
 /**
+ * Generate a random alphanumeric string (same pattern as my-saju-backend).
+ * Used for share codes; caller must ensure uniqueness (e.g. retry on collision).
+ */
+export function generateRandomString(length = 8): string {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+/**
  * Convert epoch milliseconds to Date (for Prisma DateTime from client timestamps).
  */
 export function toDate(epochMs: number): Date {

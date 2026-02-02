@@ -13,8 +13,10 @@ model Note {
   deletedAt    DateTime? // soft delete: set when in trash (epoch ms from client), null = active
   color        String?   // optional hex color for note (e.g. #3b82f6)
   isBookmarked Boolean   @default(false) // user bookmark (virtual folder in Recent + Folders)
+  shareCode    String?   // when set, note is publicly viewable at GET /p/:shareCode
 
   @@unique([userId, clientId])
+  @@unique([shareCode])
   @@index([userId])
   @@index([userId, workspaceId])
   @@index([userId, deletedAt])
