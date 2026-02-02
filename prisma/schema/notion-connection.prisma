@@ -1,0 +1,17 @@
+// Notion OAuth connection and sync root per user.
+// Tokens should be encrypted at rest in production (application layer or DB-level encryption).
+model NotionConnection {
+  id                  String    @id @default(uuid())
+  userId              String    @unique
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken         String    @db.Text
+  refreshToken        String?   @db.Text
+  notionWorkspaceId   String    // Notion workspace (team) id from OAuth
+  notionWorkspaceName String?   // human-readable name
+  syncRootPageId      String?   // Notion page id under which we create workspace/folders/notes
+  lastSyncAt          DateTime? // last successful sync to Notion
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([userId])
+}

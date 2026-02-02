@@ -1,0 +1,15 @@
+// Maps each Notic entity to exactly one Notion page. Prevents duplicate pages on sync.
+model NotionSyncMapping {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  entityType          String   // 'workspace' | 'folder' | 'note'
+  clientId            String   // Notic client id (workspace clientId, folder clientId, note clientId)
+  notionPageId        String   // Notion page UUID
+  notionWorkspaceId   String?  // denormalized for debugging
+  updatedAt           DateTime @updatedAt
+
+  @@unique([userId, entityType, clientId])
+  @@index([userId])
+  @@index([userId, entityType])
+}
