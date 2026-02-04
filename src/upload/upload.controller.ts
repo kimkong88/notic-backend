@@ -1,13 +1,11 @@
 import {
   Controller,
   Post,
-  UseGuards,
   UseInterceptors,
   UploadedFile,
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AuthGuard } from '../guards/authGuard';
 import { UploadService } from './upload.service';
 
 @Controller('upload')
@@ -18,10 +16,9 @@ export class UploadController {
    * POST /upload/image
    * Body: multipart/form-data with field "file" (image file).
    * Returns: { url: string } CloudFront URL of the uploaded image.
-   * Requires: Authorization header (Bearer token).
+   * No auth required (e.g. for use in PiP or unauthenticated contexts).
    */
   @Post('image')
-  @UseGuards(AuthGuard)
   @UseInterceptors(FileInterceptor('file'))
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
