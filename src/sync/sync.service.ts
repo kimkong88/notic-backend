@@ -24,6 +24,9 @@ const DEFAULT_WORKSPACE_NAME = 'Workspace 1';
 const FOLDER_CHUNK_SIZE = 100;
 const NOTE_CHUNK_SIZE = 100;
 
+/** Interactive transaction timeout for push (ms). Default 5s is too low for large syncs. */
+const PUSH_TRANSACTION_TIMEOUT_MS = 30_000;
+
 /** Pull pagination: default and max notes per page (consistent response shape). */
 const DEFAULT_PULL_LIMIT = 1000;
 const MAX_PULL_LIMIT = 5000;
@@ -193,7 +196,8 @@ export class SyncService {
       payloadWorkspacesCount > 0 ? payloadWorkspacesCount : 1;
 
     try {
-      await transactionRunner.runTransaction(async (tx) => {
+      await transactionRunner.runTransaction(
+        async (tx) => {
         const workspaceList =
           payloadWorkspacesCount > 0
             ? dto.workspaces!
@@ -309,7 +313,9 @@ export class SyncService {
           },
           tx,
         );
-      });
+      },
+        { timeout: PUSH_TRANSACTION_TIMEOUT_MS },
+      );
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : 'Unknown sync error';

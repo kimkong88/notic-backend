@@ -68,7 +68,10 @@ describe('SyncService', () => {
       const dto: SyncPushDto = { notes: [], folders: [], workspaces: [] };
       await service.push(userId, dto);
       expect(runTransaction).toHaveBeenCalledTimes(1);
-      expect(runTransaction).toHaveBeenCalledWith(expect.any(Function));
+      expect(runTransaction).toHaveBeenCalledWith(
+        expect.any(Function),
+        { timeout: 30_000 },
+      );
     });
 
     it('uses default workspace when workspaces is empty', async () => {
